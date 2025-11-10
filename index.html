@@ -135,7 +135,7 @@
       display: block;
     }
 
-    /* الحقول الإلزامية عند وجود خطأ */
+    /* الحقول الإلزامية عند وجود خطأ في الطباعة فقط */
     .required-field.error {
       border-color: #dc3545 !important;
       box-shadow: 0 0 0 1px rgba(220,53,69,0.3);
@@ -146,7 +146,6 @@
       body { margin: 0; background: #fff; }
       .page-container { max-width: none; margin: 0; }
 
-      /* إخفاء جميع الأزرار عند الطباعة */
       .btn,
       .delete-btn {
         display: none !important;
@@ -678,13 +677,11 @@
 <!-- مكتبة Supabase -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  // ضع قيم مشروعك هنا
   const SUPABASE_URL = "https://scnatcektqebuwyzflgb.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjbmF0Y2VrdHFlYnV3eXpmbGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODIzMDksImV4cCI6MjA3ODM1ODMwOX0.meASFDbwYz9Hy7DOKb7ILeGEwWA8faKH5ukJ-XpfLT8";
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // خريطة أسماء الشهور بالعربية إلى أرقام
   const arabicMonthsMap = {
     "يناير": 1,
     "فبراير": 2,
@@ -702,7 +699,7 @@
 
   function parseArabicDateToISO(dateStr) {
     if (!dateStr) return null;
-    const parts = dateStr.trim().split(/\s+/); // مثال: "10 نوفمبر 2025"
+    const parts = dateStr.trim().split(/\s+/);
     if (parts.length < 3) return null;
     const day = parseInt(parts[0], 10);
     const monthName = parts[1];
@@ -711,10 +708,9 @@
     if (!month || isNaN(day)) return null;
     const dd = String(day).padStart(2, '0');
     const mm = String(month).padStart(2, '0');
-    return `${year}-${mm}-${dd}`; // yyyy-mm-dd
+    return `${year}-${mm}-${dd}`;
   }
 
-  // إظهار / إخفاء النماذج حسب اختيار القائمة
   function showReport(id) {
     document.querySelectorAll('.report-panel').forEach(p => p.classList.remove('active'));
     if (id) {
@@ -727,7 +723,6 @@
     showReport(this.value);
   });
 
-  // إضافة صف جديد في الجدول الأقرب للزر
   function addRow(btn) {
     let table = btn.previousElementSibling;
     while (table && table.tagName !== 'TABLE') {
@@ -765,18 +760,15 @@
     }
   }
 
-  // تطبيق clearIfOther على جميع الحقول ذات القائمة القابلة للتحرير
   document.addEventListener('input', function(e) {
     if (e.target.classList.contains('editable-select')) {
       clearIfOther(e);
     }
-    // إزالة التلوين الأحمر عند التعديل
     if (e.target.classList.contains('required-field')) {
       e.target.classList.remove('error');
     }
   });
 
-  // دالة التحقق قبل الطباعة (ما زالت فعالة فقط للطباعة)
   function validateAndPrint(btn) {
     const activePanel = btn.closest('.report-panel');
     if (!activePanel || !activePanel.classList.contains('active')) {
@@ -819,7 +811,7 @@
     window.print();
   }
 
-  // حفظ التقرير في Supabase (بدون تحقق من الحقول)
+  // حفظ التقرير بالكامل في Supabase
   async function saveReportToSupabase(btn) {
     const activePanel = btn.closest('.report-panel');
     if (!activePanel || !activePanel.classList.contains('active')) {
@@ -827,7 +819,6 @@
       return;
     }
 
-    // تحديد الفريق من id
     let teamCode = "";
     if (activePanel.id === "teamA") teamCode = "A";
     else if (activePanel.id === "teamB") teamCode = "B";
@@ -836,7 +827,7 @@
 
     const container = activePanel.querySelector('.container');
 
-    // اسم المشروع من أول خلية
+    // اسم المشروع
     let projectName = "";
     const firstHeaderCell = container.querySelector('.header-table tr:first-child td:first-child');
     if (firstHeaderCell) {
@@ -844,31 +835,24 @@
       projectName = text.replace("اسم المشروع:", "").trim();
     }
 
-    // حقل المقطع الحالي
     const sectionInput = container.querySelector('.section-input');
     const sectionName = sectionInput ? sectionInput.value.trim() : "";
 
-    // التاريخ واليوم
     const reportDateInput = container.querySelector('.reportDate');
     const reportDayInput = container.querySelector('.reportDay');
     const reportDateStr = reportDateInput ? reportDateInput.value.trim() : "";
     const reportDay = reportDayInput ? reportDayInput.value.trim() : "";
 
-    // اسم معدّ التقرير
     const preparedByInput = container.querySelector('.prepared-by-input');
     const preparedBy = preparedByInput ? preparedByInput.value.trim() : "";
 
-    // تحويل التاريخ أو استخدام اليوم الحالي
     let isoDate = null;
-    if (reportDateStr) {
-      isoDate = parseArabicDateToISO(reportDateStr);
-    }
+    if (reportDateStr) isoDate = parseArabicDateToISO(reportDateStr);
     if (!isoDate) {
       const now = new Date();
       isoDate = now.toISOString().split('T')[0];
     }
 
-    // إدخال رأس التقرير
     const { data: reportData, error: reportError } = await supabaseClient
       .from('daily_reports')
       .insert([
@@ -886,28 +870,26 @@
 
     if (reportError) {
       console.error(reportError);
-      alert("حدث خطأ أثناء حفظ رأس التقرير في قاعدة البيانات.");
+      alert("حدث خطأ أثناء حفظ رأس التقرير في قاعدة البيانات:\n" +
+            (reportError.message || JSON.stringify(reportError)));
       return;
     }
 
     const reportId = reportData.id;
+    const itemsToInsert = [];
 
-    // إيجاد جدول "الأعمال المنجزة اليوم"
-    let workTable = null;
+    // نستخدم نفس قائمة العناوين للبحث عن الجداول
     const h2List = container.querySelectorAll('h2');
+
+    // 1) الأعمال المنجزة اليوم
+    let workTable = null;
     h2List.forEach(h => {
       if (!workTable && h.textContent.includes("الأعمال المنجزة اليوم")) {
         let el = h.nextElementSibling;
-        while (el && el.tagName !== 'TABLE') {
-          el = el.nextElementSibling;
-        }
-        if (el && el.classList.contains('summary-table')) {
-          workTable = el;
-        }
+        while (el && el.tagName !== 'TABLE') el = el.nextElementSibling;
+        if (el && el.classList.contains('summary-table')) workTable = el;
       }
     });
-
-    const itemsToInsert = [];
 
     if (workTable) {
       const rows = workTable.querySelectorAll('tbody tr');
@@ -927,7 +909,152 @@
             task_name: taskName || null,
             description: description || null,
             quantity: quantity || null,
-            extra: {}
+            extra: { section: "work" }
+          });
+        }
+      });
+    }
+
+    // 2) الموظفين
+    let laborTable = null;
+    h2List.forEach(h => {
+      if (!laborTable && h.textContent.includes("الموظفين")) {
+        let el = h.nextElementSibling;
+        while (el && el.tagName !== 'TABLE') el = el.nextElementSibling;
+        if (el && el.classList.contains('resources-table')) laborTable = el;
+      }
+    });
+
+    if (laborTable) {
+      const rows = laborTable.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const roleInput = row.querySelector('td:nth-child(1) input');
+        const countInput = row.querySelector('td:nth-child(2) input');
+        const notesInput = row.querySelector('td:nth-child(3) input, td:nth-child(3) textarea');
+
+        const role = roleInput ? roleInput.value.trim() : "";
+        const count = countInput ? countInput.value.trim() : "";
+        const notes = notesInput ? notesInput.value.trim() : "";
+
+        if (role || count || notes) {
+          itemsToInsert.push({
+            report_id: reportId,
+            item_type: "labor",
+            task_name: role || null,
+            description: notes || null,
+            quantity: count || null,
+            extra: { section: "labor" }
+          });
+        }
+      });
+    }
+
+    // 3) المعدات
+    let equipTable = null;
+    h2List.forEach(h => {
+      if (!equipTable && h.textContent.includes("المعدات")) {
+        let el = h.nextElementSibling;
+        while (el && el.tagName !== 'TABLE') el = el.nextElementSibling;
+        if (el && el.classList.contains('resources-table')) equipTable = el;
+      }
+    });
+
+    if (equipTable) {
+      const rows = equipTable.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const nameInput   = row.querySelector('td:nth-child(1) input');
+        const countInput  = row.querySelector('td:nth-child(2) input');
+        const hoursInput  = row.querySelector('td:nth-child(3) input');
+        const statusInput = row.querySelector('td:nth-child(4) input');
+
+        const name   = nameInput ? nameInput.value.trim()   : "";
+        const count  = countInput ? countInput.value.trim() : "";
+        const hours  = hoursInput ? hoursInput.value.trim() : "";
+        const status = statusInput ? statusInput.value.trim(): "";
+
+        if (name || count || hours || status) {
+          itemsToInsert.push({
+            report_id: reportId,
+            item_type: "equipment",
+            task_name: name || null,
+            description: null,
+            quantity: count || null,
+            extra: {
+              section: "equipment",
+              hours: hours || null,
+              status: status || null
+            }
+          });
+        }
+      });
+    }
+
+    // 4) فحص الجودة والسلامة
+    let safetyTable = null;
+    h2List.forEach(h => {
+      if (!safetyTable && h.textContent.includes("فحص الجودة والسلامة")) {
+        let el = h.nextElementSibling;
+        while (el && el.tagName !== 'TABLE') el = el.nextElementSibling;
+        if (el && el.classList.contains('safety-check')) safetyTable = el;
+      }
+    });
+
+    if (safetyTable) {
+      const rows = safetyTable.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const itemInput   = row.querySelector('td:nth-child(1) input');
+        const checkInput  = row.querySelector('td:nth-child(2) input[type="checkbox"]');
+        const notesInput  = row.querySelector('td:nth-child(3) input, td:nth-child(3) textarea');
+
+        const item  = itemInput ? itemInput.value.trim() : "";
+        const notes = notesInput ? notesInput.value.trim() : "";
+        const checked = checkInput ? !!checkInput.checked : false;
+
+        if (item || notes || checked) {
+          itemsToInsert.push({
+            report_id: reportId,
+            item_type: "safety",
+            task_name: item || null,
+            description: notes || null,
+            quantity: null,
+            extra: {
+              section: "safety",
+              checked: checked
+            }
+          });
+        }
+      });
+    }
+
+    // 5) المعوقات والملاحظات
+    let issueTable = null;
+    h2List.forEach(h => {
+      if (!issueTable && h.textContent.includes("المعوقات والملاحظات")) {
+        let el = h.nextElementSibling;
+        while (el && el.tagName !== 'TABLE') el = el.nextElementSibling;
+        if (el && el.tagName === 'TABLE') issueTable = el;
+      }
+    });
+
+    if (issueTable) {
+      const rows = issueTable.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const descInput   = row.querySelector('td:nth-child(1) input');
+        const actionInput = row.querySelector('td:nth-child(2) textarea, td:nth-child(2) input');
+        const statusInput = row.querySelector('td:nth-child(3) input');
+
+        const issueDesc = descInput ? descInput.value.trim()   : "";
+        const action    = actionInput ? actionInput.value.trim(): "";
+        const status    = statusInput ? statusInput.value.trim(): "";
+
+        if (issueDesc || action || status) {
+          itemsToInsert.push({
+            report_id: reportId,
+            item_type: "issue",
+            task_name: issueDesc || null,
+            description: action || null,
+            quantity: status || null,
+            extra: { section: "issues" }
           });
         }
       });
@@ -940,15 +1067,15 @@
 
       if (itemsError) {
         console.error(itemsError);
-        alert("تم حفظ رأس التقرير، لكن حدث خطأ أثناء حفظ بنود الأعمال.");
+        alert("تم حفظ رأس التقرير، لكن حدث خطأ أثناء حفظ تفاصيل البنود:\n" +
+              (itemsError.message || JSON.stringify(itemsError)));
         return;
       }
     }
 
-    alert("✅ تم حفظ التقرير في قاعدة البيانات بنجاح.");
+    alert("✅ تم حفظ التقرير بكل تفاصيله في قاعدة البيانات.");
   }
 
-  // تعبئة التاريخ واليوم لجميع النماذج
   document.addEventListener('DOMContentLoaded', function() {
     const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
     const days = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
@@ -959,7 +1086,6 @@
     document.querySelectorAll('.reportDate').forEach(el => el.value = dateStr);
     document.querySelectorAll('.reportDay').forEach(el => el.value = dayStr);
 
-    // افتراضيًا عرض تقرير الفريق (أ)
     document.getElementById('reportSelector').value = 'teamA';
     showReport('teamA');
   });
