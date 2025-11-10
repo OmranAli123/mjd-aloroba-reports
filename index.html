@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>التقرير اليومي الموحد - فرق المشروع</title>
+  <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'El Messiri', sans-serif;
+      background-color: #f7f7fa;
+      color: #333;
+      margin: 20px;
+      line-height: 1.7;
+    }
+    .page-container {
+      max-width: 1120px;
+      margin: auto;
+    }
+    .top-bar {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+    }
+    .top-bar-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #17a2b8;
+    }
+    .top-bar select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      min-width: 220px;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+    h1 {
+      text-align: center;
+      border-bottom: 3px solid #17a2b8;
+      padding-bottom: 10px;
+      color: #17a2b8;
+    }
+    h1.team-b {
+      border-color: #17a2b8;
+      color: #17a2b8;
+    }
+    h1.team-c {
+      border-color: #dc3545;
+      color: #dc3545;
+    }
+    h2 {
+      color: #28a745;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 6px;
+      margin-top: 20px;
+    }
+    .team-c h2 {
+      color: #17a2b8;
+    }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+    th, td { border: 1px solid #dee2e6; padding: 8px; vertical-align: middle; }
+    th { background-color: #17a2b8; color: white; text-align: center; }
+    .summary-table th { background-color: #6c757d; }
+    .resources-table th { background-color: #ffc107; color: #333; }
+    .safety-check.team-a th { background-color: #dc3545; color:#fff; }
+    .team-b .safety-check th { background-color: #dc3545; color:#fff; }
+    .team-c .safety-check th { background-color: #28a745; color:#fff; }
+    .team-c .summary-table th { background-color: #17a2b8; }
+    input, textarea {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 6px;
+      font-family: inherit;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+    .editable-select {
+      width: 100%;
+      padding: 6px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .btn {
+      background-color: #007bff;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin: 6px 0;
+    }
+    .btn:hover { background-color: #0056b3; }
+    .delete-btn {
+      background-color: #dc3545; color:#fff; border:none;
+      border-radius:5px; padding:4px 10px; cursor:pointer;
+    }
+    .delete-btn:hover { background-color: #b02a37; }
+    .header-table td {
+      border: none;
+      padding: 6px 12px;
+    }
+    .footer-section {
+      margin-top: 30px;
+      border-top: 2px solid #ccc;
+      padding-top: 15px;
+    }
+
+    .report-panel {
+      display: none;
+    }
+    .report-panel.active {
+      display: block;
+    }
+
+    /* الحقول الإلزامية عند وجود خطأ */
+    .required-field.error {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 0 1px rgba(220,53,69,0.3);
+    }
+
+    @media print {
+      .top-bar { display: none; }
+      body { margin: 0; background: #fff; }
+      .page-container { max-width: none; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-container">
+
+  <!-- شريط اختيار نوع التقرير -->
+  <div class="top-bar">
+    <div class="top-bar-title">التقرير اليومي الموحد لمشروع: طريق مجد العروبة – النجاح</div>
+    <div>
+      <label for="reportSelector">اختر فريق التقرير:</label>
+      <select id="reportSelector">
+        <option value="">-- اختر نوع التقرير --</option>
+        <option value="teamA">تقرير الفريق (أ) - أعمال الحفر والإزالة</option>
+        <option value="teamB">تقرير الفريق (ب) - الأعمال التحتية والطبقات القاعدية</option>
+        <option value="teamC">تقرير الفريق (ج) - الرصف والتشطيبات</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- تقرير الفريق (أ) -->
+  <div id="teamA" class="report-panel">
+    <div class="container team-a">
+      <h1>التقرير اليومي للفريق (أ)</h1>
+
+      <h2>البيانات الأساسية</h2>
+      <table class="header-table">
+        <tr>
+          <td><strong>اسم المشروع:</strong> طريق مجد العروبة – النجاح</td>
+          <td>
+            <strong>المقطع الحالي:</strong>
+            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field">
+          </td>
+        </tr>
+        <tr>
+          <td><strong>التاريخ (ميلادي):</strong> <input type="text" class="reportDate" readonly></td>
+          <td><strong>اليوم:</strong> <input type="text" class="reportDay" readonly></td>
+        </tr>
+      </table>
+
+      <h2>1. الأعمال المنجزة اليوم</h2>
+      <table class="summary-table">
+        <thead>
+          <tr><th>المهمة</th><th>الوصف</th><th>الكمية المنجزة</th><th>إجراء</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="workOptionsA" class="editable-select required-field" placeholder="اختر أو اكتب مهمة">
+              <datalist id="workOptionsA">
+                <option>تحديد الموقع والتخطيط</option>
+                <option>إزالة الأسفلت القديم</option>
+                <option>الحفر والتوسعة</option>
+                <option>نقل المخلفات</option>
+                <option>تسوية الأرضية</option>
+                <option>ردم أولي / تدعيم جانبي</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><textarea class="required-field"></textarea></td>
+            <td><input class="required-field"></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة بند</button>
+
+      <h2>2. الموظفين</h2>
+      <table class="resources-table">
+        <thead><tr><th>الوظيفة</th><th>العدد</th><th>ملاحظات</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="laborOptionsA" class="editable-select" placeholder="اختر أو اكتب وظيفة">
+              <datalist id="laborOptionsA">
+                <option>مشرف أعمال</option>
+                <option>مراقب سلامة</option>
+                <option>سائق حفار</option>
+                <option>سائق شاحنة</option>
+                <option>عامل</option>
+                <option>مهندس موقع</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><input type="number" min="0"></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة عامل</button>
+
+      <h2>3. المعدات</h2>
+      <table class="resources-table">
+        <thead><tr><th>الآلية</th><th>العدد</th><th>ساعات التشغيل</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="equipOptionsA" class="editable-select" placeholder="اختر أو اكتب نوع المعدة">
+              <datalist id="equipOptionsA">
+                <option>حفار (Excavator)</option>
+                <option>جرافة / شيول (Loader)</option>
+                <option>كاشطة أسفلت</option>
+                <option>شاحنة نقل</option>
+                <option>مدحلة</option>
+                <option>صهريج مياه</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><input type="number" min="0"></td>
+            <td><input></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة معدة</button>
+
+      <h2>4. فحص الجودة والسلامة</h2>
+      <table class="safety-check team-a">
+        <thead><tr><th>البند</th><th>✔</th><th>الملاحظات</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="safetyOptionsA" class="editable-select" placeholder="اختر أو اكتب بند الفحص">
+              <datalist id="safetyOptionsA">
+                <option>تأمين منطقة العمل</option>
+                <option>معدات الوقاية الشخصية</option>
+                <option>الإشارات التحذيرية</option>
+                <option>نظافة الموقع</option>
+                <option>اختبارات الجودة</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td style="text-align:center;"><input type="checkbox"></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة بند فحص</button>
+
+      <h2>5. المعوقات والملاحظات</h2>
+      <table>
+        <thead><tr><th>الوصف</th><th>الإجراء المتخذ / المطلوب</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="issueOptionsA" class="editable-select" placeholder="اختر أو اكتب نوع المعوق">
+              <datalist id="issueOptionsA">
+                <option>عطل في المعدات</option>
+                <option>تأخير توريد المواد</option>
+                <option>أحوال جوية</option>
+                <option>تعارض مع فرق أخرى</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><textarea></textarea></td>
+            <td><input placeholder="مفتوح / مغلق"></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة ملاحظة</button>
+
+      <div class="footer-section">
+        <h2>بيانات معدّ التقرير</h2>
+        <table class="header-table">
+          <tr>
+            <td>
+              <strong>اسم معدّ التقرير:</strong>
+              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field">
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <button class="btn" onclick="validateAndPrint(this)">🖨 طباعة التقرير</button>
+    </div>
+  </div>
+
+  <!-- تقرير الفريق (ب) -->
+  <div id="teamB" class="report-panel">
+    <div class="container team-b">
+      <h1 class="team-b">التقرير اليومي للفريق (ب)</h1>
+
+      <h2>البيانات الأساسية</h2>
+      <table class="header-table">
+        <tr>
+          <td><strong>اسم المشروع:</strong> طريق مجد العروبة – النجاح</td>
+          <td>
+            <strong>المقطع الحالي:</strong>
+            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field">
+          </td>
+        </tr>
+        <tr>
+          <td><strong>التاريخ (ميلادي):</strong> <input type="text" class="reportDate" readonly></td>
+          <td><strong>اليوم:</strong> <input type="text" class="reportDay" readonly></td>
+        </tr>
+      </table>
+
+      <h2>1. الأعمال المنجزة اليوم</h2>
+      <table class="summary-table">
+        <thead>
+          <tr><th>المهمة</th><th>الوصف</th><th>الكمية المنجزة</th><th>إجراء</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="workOptionsB" class="editable-select required-field">
+              <datalist id="workOptionsB">
+                <option>تمديد المواسير الأرضية</option>
+                <option>تمديد الكابلات الكهربائية</option>
+                <option>صب قواعد الإنارة</option>
+                <option>فرش طبقة Sub-base</option>
+                <option>اختبارات الدك (Sub-base)</option>
+                <option>فرش طبقة Base course</option>
+                <option>اختبارات الدك (Base course)</option>
+                <option>تنظيف الموقع وتحضيره للتسليم</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><textarea class="required-field"></textarea></td>
+            <td><input class="required-field"></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة بند</button>
+
+      <h2>2. الموظفين</h2>
+      <table class="resources-table">
+        <thead><tr><th>الوظيفة</th><th>العدد</th><th>ملاحظات</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="laborOptionsB" class="editable-select">
+              <datalist id="laborOptionsB">
+                <option>مشرف مدني</option>
+                <option>فني مختبر</option>
+                <option>مساح</option>
+                <option>مشغل مدحلة</option>
+                <option>مشغل ممھدة</option>
+                <option>عامل تمديدات</option>
+                <option>عامل مساعد</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><input type="number" min="0"></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة عامل</button>
+
+      <h2>3. المعدات</h2>
+      <table class="resources-table">
+        <thead><tr><th>الآلية</th><th>العدد</th><th>ساعات التشغيل</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="equipOptionsB" class="editable-select">
+              <datalist id="equipOptionsB">
+                <option>مدحلة اهتزازية</option>
+                <option>مدحلة كفرات</option>
+                <option>ممھدة</option>
+                <option>صهريج مياه</option>
+                <option>شيول</option>
+                <option>حفار</option>
+                <option>شاحنات نقل</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><input type="number" min="0"></td>
+            <td><input></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة معدة</button>
+
+      <h2>4. فحص الجودة والسلامة</h2>
+      <table class="safety-check">
+        <thead><tr><th>البند</th><th>✔</th><th>الملاحظات</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="safetyOptionsB" class="editable-select">
+              <datalist id="safetyOptionsB">
+                <option>اختبارات الكثافة والرطوبة</option>
+                <option>تحقق الدك لطبقة Sub-base</option>
+                <option>تحقق الدك لطبقة Base course</option>
+                <option>تأمين الخنادق والتمديدات</option>
+                <option>نظافة الموقع</option>
+                <option>سلامة المعدات والعمال</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td style="text-align:center;"><input type="checkbox"></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة بند فحص</button>
+
+      <h2>5. المعوقات والملاحظات</h2>
+      <table>
+        <thead><tr><th>الوصف</th><th>الإجراء المتخذ / المطلوب</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="issueOptionsB" class="editable-select">
+              <datalist id="issueOptionsB">
+                <option>تأخر المواد</option>
+                <option>عطل معدة</option>
+                <option>ظروف جوية</option>
+                <option>تعارض أعمال</option>
+                <option>نقص عمالة</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><textarea></textarea></td>
+            <td><input placeholder="مفتوح / مغلق"></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة ملاحظة</button>
+
+      <div class="footer-section">
+        <h2>بيانات معدّ التقرير</h2>
+        <table class="header-table">
+          <tr>
+            <td>
+              <strong>اسم معدّ التقرير:</strong>
+              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field">
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <button class="btn" onclick="validateAndPrint(this)">🖨 طباعة التقرير</button>
+    </div>
+  </div>
+
+  <!-- تقرير الفريق (ج) -->
+  <div id="teamC" class="report-panel">
+    <div class="container team-c">
+      <h1 class="team-c">التقرير اليومي للفريق (ج)</h1>
+    <h2>الرصف والتشطيبات</h2>
+
+      <h2>البيانات الأساسية</h2>
+      <table class="header-table">
+        <tr>
+          <td><strong>اسم المشروع:</strong> الطريق الرابط بين مجد العروبة والنجاح</td>
+          <td>
+            <strong>المقطع الحالي:</strong>
+            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field">
+          </td>
+        </tr>
+        <tr>
+          <td><strong>التاريخ (ميلادي):</strong> <input type="text" class="reportDate" readonly></td>
+          <td><strong>اليوم:</strong> <input type="text" class="reportDay" readonly></td>
+        </tr>
+      </table>
+
+      <h2>1. الأعمال المنجزة اليوم</h2>
+      <table class="summary-table">
+        <thead>
+          <tr><th>المهمة</th><th>الوصف</th><th>الكمية المنجزة</th><th>إجراء</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="workOptionsC" class="editable-select required-field">
+              <datalist id="workOptionsC">
+                <option>رش طبقة تشريب (Prime Coat)</option>
+                <option>فرش طبقة تشريب لاصقة (Tack Coat)</option>
+                <option>فرش طبقة الأسفلت الرابطة</option>
+                <option>فرش طبقة الأسفلت النهائية</option>
+                <option>دمك وتشطيب الأسفلت</option>
+                <option>تخطيط الشوارع (دهانات مرورية)</option>
+                <option>تركيب إشارات مرورية</option>
+                <option>تركيب أعمدة وكشافات الإنارة</option>
+                <option>تنظيف الموقع للتسليم</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><textarea class="required-field"></textarea></td>
+            <td><input class="required-field"></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة بند</button>
+
+      <h2>2. الموظفين</h2>
+      <table class="resources-table">
+        <thead><tr><th>الوظيفة</th><th>العدد</th><th>المهام</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="laborOptionsC" class="editable-select">
+              <datalist id="laborOptionsC">
+                <option>مشرف أعمال إسفلت</option>
+                <option>مهندس كهرباء</option>
+                <option>فني مختبر (أسفلت)</option>
+                <option>مشغل فنّاشة أسفلت</option>
+                <option>مشغل مدحلة</option>
+                <option>عامل دهانات خطوط الطرق</option>
+                <option>فني كهرباء وإنارة</option>
+                <option>عمال عامون</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><input type="number" min="0"></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة عامل</button>
+
+      <h2>3. المعدات</h2>
+      <table class="resources-table">
+        <thead><tr><th>المعدة</th><th>العدد</th><th>ساعات التشغيل</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="equipOptionsC" class="editable-select">
+              <datalist id="equipOptionsC">
+                <option>فنّاشة أسفلت (Paver)</option>
+                <option>مدحلة اهتزازية</option>
+                <option>مدحلة ناعمة (Steel Roller)</option>
+                <option>صهريج أسفلت سائل (Sprayer)</option>
+                <option>آلة تخطيط طرق</option>
+                <option>رافعة تركيب أعمدة</option>
+                <option>شاحنات نقل أسفلت</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><input type="number" min="0"></td>
+            <td><input></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة معدة</button>
+
+      <h2>4. فحص الجودة والسلامة</h2>
+      <table class="safety-check">
+        <thead><tr><th>البند</th><th>✔</th><th>الملاحظات</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="safetyOptionsC" class="editable-select">
+              <datalist id="safetyOptionsC">
+                <option>تحقق من درجة حرارة الأسفلت</option>
+                <option>نتائج اختبار مارشال (Marshall)</option>
+                <option>مراقبة جودة الدمك</option>
+                <option>اختبار سمك الطبقة</option>
+                <option>تثبيت إشارات التحذير أثناء العمل</option>
+                <option>سلامة العمال والمعدات</option>
+                <option>نظافة الموقع النهائية</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td style="text-align:center;"><input type="checkbox"></td>
+            <td><input></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة بند فحص</button>
+
+      <h2>5. المعوقات والملاحظات</h2>
+      <table>
+        <thead><tr><th>الوصف</th><th>الإجراء المتخذ / المطلوب</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <input list="issueOptionsC" class="editable-select">
+              <datalist id="issueOptionsC">
+                <option>تأخر توريد الأسفلت</option>
+                <option>عطل في الفنّاشة أو المدحلة</option>
+                <option>ظروف جوية / ارتفاع حرارة</option>
+                <option>تعارض مع فرق الكهرباء</option>
+                <option>نقص في العمالة أو المواد</option>
+                <option>أخرى</option>
+              </datalist>
+            </td>
+            <td><textarea></textarea></td>
+            <td><input placeholder="مفتوح / مغلق"></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">🗑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" onclick="addRow(this)">➕ إضافة ملاحظة</button>
+
+      <div class="footer-section">
+        <h2>بيانات معدّ التقرير</h2>
+        <table class="header-table">
+          <tr>
+            <td>
+              <strong>اسم معدّ التقرير:</strong>
+              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field">
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <button class="btn" onclick="validateAndPrint(this)">🖨 طباعة التقرير</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // إظهار / إخفاء النماذج حسب اختيار القائمة
+  function showReport(id) {
+    document.querySelectorAll('.report-panel').forEach(p => p.classList.remove('active'));
+    if (id) {
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.add('active');
+    }
+  }
+
+  document.getElementById('reportSelector').addEventListener('change', function() {
+    showReport(this.value);
+  });
+
+  // إضافة صف جديد في الجدول الأقرب للزر
+  function addRow(btn) {
+    let table = btn.previousElementSibling;
+    while (table && table.tagName !== 'TABLE') {
+      table = table.previousElementSibling;
+    }
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    if (!tbody || !tbody.rows.length) return;
+
+    const clone = tbody.rows[0].cloneNode(true);
+    clone.querySelectorAll('input, textarea').forEach(el => {
+      if (el.type === 'checkbox') {
+        el.checked = false;
+      } else {
+        el.value = '';
+      }
+      // إزالة حالة الخطأ لو تم نسخها
+      el.classList.remove('error');
+    });
+    tbody.appendChild(clone);
+  }
+
+  function deleteRow(btn) {
+    const row = btn.closest('tr');
+    const tbody = row.parentElement;
+    if (tbody.rows.length > 1) {
+      row.remove();
+    } else {
+      alert("⚠️ لا يمكن حذف آخر صف!");
+    }
+  }
+
+  function clearIfOther(e) {
+    if (e.target.value && e.target.value.trim() === "أخرى") {
+      e.target.value = "";
+    }
+  }
+
+  // تطبيق clearIfOther على جميع الحقول ذات القائمة القابلة للتحرير
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('editable-select')) {
+      clearIfOther(e);
+    }
+    // إزالة التلوين الأحمر عند التعديل
+    if (e.target.classList.contains('required-field')) {
+      e.target.classList.remove('error');
+    }
+  });
+
+  // دالة التحقق قبل الطباعة
+  function validateAndPrint(btn) {
+    const activePanel = btn.closest('.report-panel');
+    if (!activePanel || !activePanel.classList.contains('active')) {
+      alert("يرجى اختيار نوع التقرير من القائمة العلوية أولاً.");
+      return;
+    }
+
+    const requiredFields = activePanel.querySelectorAll('.required-field');
+    let firstError = null;
+    let hasError = false;
+
+    requiredFields.forEach(field => {
+      field.classList.remove('error');
+      let invalid = false;
+
+      if (field.type === 'checkbox') {
+        if (!field.checked) invalid = true;
+      } else {
+        if (!field.value || !field.value.trim()) invalid = true;
+      }
+
+      if (invalid) {
+        field.classList.add('error');
+        if (!firstError) firstError = field;
+        hasError = true;
+      }
+    });
+
+    if (hasError) {
+      alert("يرجى تعبئة الحقول الإلزامية المظللة باللون الأحمر قبل الطباعة.");
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          try { firstError.focus(); } catch(e) {}
+        }, 400);
+      }
+      return;
+    }
+
+    // إذا لا توجد أخطاء، نفذ الطباعة
+    window.print();
+  }
+
+  // تعبئة التاريخ واليوم لجميع النماذج
+  document.addEventListener('DOMContentLoaded', function() {
+    const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+    const days = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+    const now = new Date();
+    const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    const dayStr = days[now.getDay()];
+
+    document.querySelectorAll('.reportDate').forEach(el => el.value = dateStr);
+    document.querySelectorAll('.reportDay').forEach(el => el.value = dayStr);
+
+    // افتراضيًا عرض تقرير الفريق (أ)
+    document.getElementById('reportSelector').value = 'teamA';
+    showReport('teamA');
+  });
+</script>
+</body>
+</html>
