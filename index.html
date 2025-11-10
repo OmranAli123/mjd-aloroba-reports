@@ -776,7 +776,7 @@
     }
   });
 
-  // دالة التحقق قبل الطباعة
+  // دالة التحقق قبل الطباعة (ما زالت فعالة فقط للطباعة)
   function validateAndPrint(btn) {
     const activePanel = btn.closest('.report-panel');
     if (!activePanel || !activePanel.classList.contains('active')) {
@@ -819,7 +819,7 @@
     window.print();
   }
 
-  // حفظ التقرير في Supabase
+  // حفظ التقرير في Supabase (بدون تحقق من الحقول)
   async function saveReportToSupabase(btn) {
     const activePanel = btn.closest('.report-panel');
     if (!activePanel || !activePanel.classList.contains('active')) {
@@ -858,12 +858,11 @@
     const preparedByInput = container.querySelector('.prepared-by-input');
     const preparedBy = preparedByInput ? preparedByInput.value.trim() : "";
 
-    if (!sectionName || !reportDateStr || !preparedBy) {
-      alert("يرجى التأكد من تعبئة: المقطع الحالي، التاريخ، واسم معدّ التقرير قبل الحفظ.");
-      return;
+    // تحويل التاريخ أو استخدام اليوم الحالي
+    let isoDate = null;
+    if (reportDateStr) {
+      isoDate = parseArabicDateToISO(reportDateStr);
     }
-
-    let isoDate = parseArabicDateToISO(reportDateStr);
     if (!isoDate) {
       const now = new Date();
       isoDate = now.toISOString().split('T')[0];
@@ -876,10 +875,10 @@
         {
           team_code: teamCode,
           project_name: projectName || "طريق مجد العروبة – النجاح",
-          section_name: sectionName,
+          section_name: sectionName || null,
           report_date: isoDate,
-          report_day: reportDay,
-          prepared_by: preparedBy
+          report_day: reportDay || null,
+          prepared_by: preparedBy || null
         }
       ])
       .select()
@@ -925,9 +924,9 @@
           itemsToInsert.push({
             report_id: reportId,
             item_type: "work",
-            task_name: taskName,
-            description: description,
-            quantity: quantity,
+            task_name: taskName || null,
+            description: description || null,
+            quantity: quantity || null,
             extra: {}
           });
         }
