@@ -110,7 +110,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.9rem;
-      margin: 6px 0;
+      margin: 6px 4px 6px 0;
     }
     .btn:hover { background-color: #0056b3; }
     .delete-btn {
@@ -145,6 +145,12 @@
       .top-bar { display: none; }
       body { margin: 0; background: #fff; }
       .page-container { max-width: none; margin: 0; }
+
+      /* إخفاء جميع الأزرار عند الطباعة */
+      .btn,
+      .delete-btn {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -322,6 +328,7 @@
         </table>
       </div>
 
+      <button class="btn" onclick="saveReportToSupabase(this)">💾 حفظ في قاعدة البيانات</button>
       <button class="btn" onclick="validateAndPrint(this)">🖨 طباعة التقرير</button>
     </div>
   </div>
@@ -489,6 +496,7 @@
         </table>
       </div>
 
+      <button class="btn" onclick="saveReportToSupabase(this)">💾 حفظ في قاعدة البيانات</button>
       <button class="btn" onclick="validateAndPrint(this)">🖨 طباعة التقرير</button>
     </div>
   </div>
@@ -497,7 +505,7 @@
   <div id="teamC" class="report-panel">
     <div class="container team-c">
       <h1 class="team-c">التقرير اليومي للفريق (ج)</h1>
-    <h2>الرصف والتشطيبات</h2>
+      <h2>الرصف والتشطيبات</h2>
 
       <h2>البيانات الأساسية</h2>
       <table class="header-table">
@@ -660,13 +668,52 @@
         </table>
       </div>
 
+      <button class="btn" onclick="saveReportToSupabase(this)">💾 حفظ في قاعدة البيانات</button>
       <button class="btn" onclick="validateAndPrint(this)">🖨 طباعة التقرير</button>
     </div>
   </div>
 
 </div>
 
+<!-- مكتبة Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
+  // ضع قيم مشروعك هنا
+  const SUPABASE_URL = "https://scnatcektqebuwyzflgb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjbmF0Y2VrdHFlYnV3eXpmbGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODIzMDksImV4cCI6MjA3ODM1ODMwOX0.meASFDbwYz9Hy7DOKb7ILeGEwWA8faKH5ukJ-XpfLT8";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // خريطة أسماء الشهور بالعربية إلى أرقام
+  const arabicMonthsMap = {
+    "يناير": 1,
+    "فبراير": 2,
+    "مارس": 3,
+    "أبريل": 4,
+    "مايو": 5,
+    "يونيو": 6,
+    "يوليو": 7,
+    "أغسطس": 8,
+    "سبتمبر": 9,
+    "أكتوبر": 10,
+    "نوفمبر": 11,
+    "ديسمبر": 12
+  };
+
+  function parseArabicDateToISO(dateStr) {
+    if (!dateStr) return null;
+    const parts = dateStr.trim().split(/\s+/); // مثال: "10 نوفمبر 2025"
+    if (parts.length < 3) return null;
+    const day = parseInt(parts[0], 10);
+    const monthName = parts[1];
+    const year = parts[2];
+    const month = arabicMonthsMap[monthName];
+    if (!month || isNaN(day)) return null;
+    const dd = String(day).padStart(2, '0');
+    const mm = String(month).padStart(2, '0');
+    return `${year}-${mm}-${dd}`; // yyyy-mm-dd
+  }
+
   // إظهار / إخفاء النماذج حسب اختيار القائمة
   function showReport(id) {
     document.querySelectorAll('.report-panel').forEach(p => p.classList.remove('active'));
@@ -697,7 +744,6 @@
       } else {
         el.value = '';
       }
-      // إزالة حالة الخطأ لو تم نسخها
       el.classList.remove('error');
     });
     tbody.appendChild(clone);
@@ -770,8 +816,135 @@
       return;
     }
 
-    // إذا لا توجد أخطاء، نفذ الطباعة
     window.print();
+  }
+
+  // حفظ التقرير في Supabase
+  async function saveReportToSupabase(btn) {
+    const activePanel = btn.closest('.report-panel');
+    if (!activePanel || !activePanel.classList.contains('active')) {
+      alert("يرجى اختيار نوع التقرير من القائمة العلوية أولاً.");
+      return;
+    }
+
+    // تحديد الفريق من id
+    let teamCode = "";
+    if (activePanel.id === "teamA") teamCode = "A";
+    else if (activePanel.id === "teamB") teamCode = "B";
+    else if (activePanel.id === "teamC") teamCode = "C";
+    else teamCode = "UNKNOWN";
+
+    const container = activePanel.querySelector('.container');
+
+    // اسم المشروع من أول خلية
+    let projectName = "";
+    const firstHeaderCell = container.querySelector('.header-table tr:first-child td:first-child');
+    if (firstHeaderCell) {
+      const text = firstHeaderCell.textContent || "";
+      projectName = text.replace("اسم المشروع:", "").trim();
+    }
+
+    const sectionInput = container.querySelector('input[placeholder*="المقطع الحالي"]');
+    const sectionName = sectionInput ? sectionInput.value.trim() : "";
+
+    const reportDateInput = container.querySelector('.reportDate');
+    const reportDayInput = container.querySelector('.reportDay');
+    const reportDateStr = reportDateInput ? reportDateInput.value.trim() : "";
+    const reportDay = reportDayInput ? reportDayInput.value.trim() : "";
+
+    const preparedByInput = container.querySelector('.footer-section input[placeholder*="اسم معدّ التقرير"]');
+    const preparedBy = preparedByInput ? preparedByInput.value.trim() : "";
+
+    if (!sectionName || !reportDateStr || !preparedBy) {
+      alert("يرجى التأكد من تعبئة: المقطع الحالي، التاريخ، واسم معدّ التقرير قبل الحفظ.");
+      return;
+    }
+
+    let isoDate = parseArabicDateToISO(reportDateStr);
+    if (!isoDate) {
+      // fallback إلى تاريخ اليوم إذا تعذر تحويل التاريخ
+      const now = new Date();
+      isoDate = now.toISOString().split('T')[0];
+    }
+
+    // إدخال رأس التقرير
+    const { data: reportData, error: reportError } = await supabaseClient
+      .from('daily_reports')
+      .insert([
+        {
+          team_code: teamCode,
+          project_name: projectName || "طريق مجد العروبة – النجاح",
+          section_name: sectionName,
+          report_date: isoDate,
+          report_day: reportDay,
+          prepared_by: preparedBy
+        }
+      ])
+      .select()
+      .single();
+
+    if (reportError) {
+      console.error(reportError);
+      alert("حدث خطأ أثناء حفظ رأس التقرير في قاعدة البيانات.");
+      return;
+    }
+
+    const reportId = reportData.id;
+
+    // إيجاد جدول "الأعمال المنجزة اليوم"
+    let workTable = null;
+    const h2List = container.querySelectorAll('h2');
+    h2List.forEach(h => {
+      if (!workTable && h.textContent.includes("الأعمال المنجزة اليوم")) {
+        let el = h.nextElementSibling;
+        while (el && el.tagName !== 'TABLE') {
+          el = el.nextElementSibling;
+        }
+        if (el && el.classList.contains('summary-table')) {
+          workTable = el;
+        }
+      }
+    });
+
+    const itemsToInsert = [];
+
+    if (workTable) {
+      const rows = workTable.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const taskInput = row.querySelector('td:nth-child(1) input, td:nth-child(1) select');
+        const descInput = row.querySelector('td:nth-child(2) textarea, td:nth-child(2) input');
+        const qtyInput  = row.querySelector('td:nth-child(3) input');
+
+        const taskName = taskInput ? taskInput.value.trim() : "";
+        const description = descInput ? descInput.value.trim() : "";
+        const quantity = qtyInput ? qtyInput.value.trim() : "";
+
+        if (taskName || description || quantity) {
+          itemsToInsert.push({
+            report_id: reportId,
+            item_type: "work",
+            task_name: taskName,
+            description: description,
+            quantity: quantity,
+            extra: {}
+          });
+        }
+      });
+    }
+
+    if (itemsToInsert.length > 0) {
+      const { error: itemsError } = await supabaseClient
+        .from('daily_report_items')
+        .insert(itemsToInsert);
+
+      if (itemsError) {
+        console.error(itemsError);
+        alert("تم حفظ رأس التقرير، لكن حدث خطأ أثناء حفظ بنود الأعمال.");
+        return;
+      }
+    }
+
+    alert("✅ تم حفظ التقرير في قاعدة البيانات بنجاح.");
   }
 
   // تعبئة التاريخ واليوم لجميع النماذج
