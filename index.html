@@ -182,7 +182,7 @@
           <td><strong>اسم المشروع:</strong> طريق مجد العروبة – النجاح</td>
           <td>
             <strong>المقطع الحالي:</strong>
-            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field">
+            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field section-input">
           </td>
         </tr>
         <tr>
@@ -322,7 +322,7 @@
           <tr>
             <td>
               <strong>اسم معدّ التقرير:</strong>
-              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field">
+              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field prepared-by-input">
             </td>
           </tr>
         </table>
@@ -344,7 +344,7 @@
           <td><strong>اسم المشروع:</strong> طريق مجد العروبة – النجاح</td>
           <td>
             <strong>المقطع الحالي:</strong>
-            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field">
+            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field section-input">
           </td>
         </tr>
         <tr>
@@ -490,7 +490,7 @@
           <tr>
             <td>
               <strong>اسم معدّ التقرير:</strong>
-              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field">
+              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field prepared-by-input">
             </td>
           </tr>
         </table>
@@ -513,7 +513,7 @@
           <td><strong>اسم المشروع:</strong> الطريق الرابط بين مجد العروبة والنجاح</td>
           <td>
             <strong>المقطع الحالي:</strong>
-            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field">
+            <input type="text" placeholder="اكتب رقم أو اسم المقطع" class="required-field section-input">
           </td>
         </tr>
         <tr>
@@ -662,7 +662,7 @@
           <tr>
             <td>
               <strong>اسم معدّ التقرير:</strong>
-              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field">
+              <input type="text" placeholder="اكتب اسم معدّ التقرير" class="required-field prepared-by-input">
             </td>
           </tr>
         </table>
@@ -844,15 +844,18 @@
       projectName = text.replace("اسم المشروع:", "").trim();
     }
 
-    const sectionInput = container.querySelector('input[placeholder*="المقطع الحالي"]');
+    // حقل المقطع الحالي
+    const sectionInput = container.querySelector('.section-input');
     const sectionName = sectionInput ? sectionInput.value.trim() : "";
 
+    // التاريخ واليوم
     const reportDateInput = container.querySelector('.reportDate');
     const reportDayInput = container.querySelector('.reportDay');
     const reportDateStr = reportDateInput ? reportDateInput.value.trim() : "";
     const reportDay = reportDayInput ? reportDayInput.value.trim() : "";
 
-    const preparedByInput = container.querySelector('.footer-section input[placeholder*="اسم معدّ التقرير"]');
+    // اسم معدّ التقرير
+    const preparedByInput = container.querySelector('.prepared-by-input');
     const preparedBy = preparedByInput ? preparedByInput.value.trim() : "";
 
     if (!sectionName || !reportDateStr || !preparedBy) {
@@ -862,7 +865,6 @@
 
     let isoDate = parseArabicDateToISO(reportDateStr);
     if (!isoDate) {
-      // fallback إلى تاريخ اليوم إذا تعذر تحويل التاريخ
       const now = new Date();
       isoDate = now.toISOString().split('T')[0];
     }
