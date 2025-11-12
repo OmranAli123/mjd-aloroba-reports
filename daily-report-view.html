@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض التقارير اليومية المحفوظة</title>
+  <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'El Messiri', sans-serif;
+      background-color: #f7f7fa;
+      color: #333;
+      margin: 20px;
+      line-height: 1.7;
+    }
+    .page-container {
+      max-width: 1120px;
+      margin: auto;
+    }
+    .top-bar {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .top-bar-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #17a2b8;
+    }
+    .nav-links a {
+      margin-left: 10px;
+      text-decoration: none;
+      color: #007bff;
+    }
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+    select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      min-width: 260px;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+    h1 {
+      text-align: center;
+      border-bottom: 3px solid #17a2b8;
+      padding-bottom: 10px;
+      color: #17a2b8;
+    }
+    h2 {
+      color: #28a745;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 6px;
+      margin-top: 20px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+    th, td { border: 1px solid #dee2e6; padding: 8px; vertical-align: middle; }
+    th { background-color: #17a2b8; color: white; text-align: center; }
+    .summary-table th { background-color: #6c757d; }
+    .resources-table th { background-color: #ffc107; color: #333; }
+    .safety-check th { background-color: #dc3545; color:#fff; }
+    .header-table td {
+      border: none;
+      padding: 6px 12px;
+    }
+    .meta-label {
+      font-weight: 600;
+      color: #555;
+    }
+    .meta-value {
+      margin-right: 5px;
+      color: #000;
+    }
+    .muted {
+      color: #777;
+      font-size: 0.9rem;
+    }
+    .no-data {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+<div class="page-container">
+
+  <!-- الشريط العلوي -->
+  <div class="top-bar">
+    <div>
+      <div class="top-bar-title">عرض التقارير اليومية المحفوظة</div>
+      <div class="muted">اختر تقريرًا من القائمة لعرض تفاصيله (قراءة فقط).</div>
+    </div>
+    <div class="nav-links">
+      <!-- عدّل اسم ملف صفحة الإدخال حسب اسم ملفك الحقيقي -->
+      <a href="daily-report-unified.html">إدخال تقرير جديد</a>
+      <a href="daily-report-view.html">عرض التقارير</a>
+    </div>
+  </div>
+
+  <!-- اختيار التقرير -->
+  <div class="container">
+    <h2>اختيار التقرير</h2>
+    <p class="muted">
+      يتم جلب قائمة التقارير من قاعدة البيانات مرتبة من الأحدث إلى الأقدم.
+    </p>
+    <select id="reportSelect">
+      <option value="">-- اختر تقريرًا من القائمة --</option>
+    </select>
+    <div id="loadingMsg" class="muted" style="margin-top:8px;"></div>
+  </div>
+
+  <!-- عرض التقرير -->
+  <div class="container" id="reportContainer" style="display:none;">
+    <h1 id="reportTitle">التقرير اليومي</h1>
+
+    <!-- البيانات الأساسية -->
+    <h2>البيانات الأساسية</h2>
+    <table class="header-table">
+      <tr>
+        <td>
+          <span class="meta-label">اسم المشروع:</span>
+          <span id="projectName" class="meta-value"></span>
+        </td>
+        <td>
+          <span class="meta-label">المقطع الحالي:</span>
+          <span id="sectionName" class="meta-value"></span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="meta-label">التاريخ (ميلادي):</span>
+          <span id="reportDate" class="meta-value"></span>
+        </td>
+        <td>
+          <span class="meta-label">اليوم:</span>
+          <span id="reportDay" class="meta-value"></span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="meta-label">فريق العمل:</span>
+          <span id="teamCode" class="meta-value"></span>
+        </td>
+        <td>
+          <span class="meta-label">اسم معدّ التقرير:</span>
+          <span id="preparedBy" class="meta-value"></span>
+        </td>
+      </tr>
+    </table>
+
+    <!-- 1. الأعمال المنجزة اليوم -->
+    <h2>1. الأعمال المنجزة اليوم</h2>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>المهمة</th>
+          <th>الوصف</th>
+          <th>الكمية المنجزة</th>
+        </tr>
+      </thead>
+      <tbody id="workBody">
+        <tr><td colspan="3" class="no-data">لا توجد بيانات مسجلة في هذا القسم.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 2. الموظفين -->
+    <h2>2. الموظفين</h2>
+    <table class="resources-table">
+      <thead>
+        <tr>
+          <th>الوظيفة</th>
+          <th>العدد</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody id="laborBody">
+        <tr><td colspan="3" class="no-data">لا توجد بيانات مسجلة في هذا القسم.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 3. المعدات -->
+    <h2>3. المعدات</h2>
+    <table class="resources-table">
+      <thead>
+        <tr>
+          <th>المعدة / الآلية</th>
+          <th>العدد</th>
+          <th>ساعات التشغيل</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody id="equipBody">
+        <tr><td colspan="4" class="no-data">لا توجد بيانات مسجلة في هذا القسم.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 4. فحص الجودة والسلامة -->
+    <h2>4. فحص الجودة والسلامة</h2>
+    <table class="safety-check">
+      <thead>
+        <tr>
+          <th>البند</th>
+          <th>✔</th>
+          <th>الملاحظات</th>
+        </tr>
+      </thead>
+      <tbody id="safetyBody">
+        <tr><td colspan="3" class="no-data">لا توجد بيانات مسجلة في هذا القسم.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 5. المعوقات والملاحظات -->
+    <h2>5. المعوقات والملاحظات</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>الوصف</th>
+          <th>الإجراء المتخذ / المطلوب</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody id="issueBody">
+        <tr><td colspan="3" class="no-data">لا توجد بيانات مسجلة في هذا القسم.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  // 👇 استعمل نفس القيم التي استخدمتها في صفحة إدخال التقارير
+  const SUPABASE_URL = "https://scnatcektqebuwyzflgb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjbmF0Y2VrdHFlYnV3eXpmbGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODIzMDksImV4cCI6MjA3ODM1ODMwOX0.meASFDbwYz9Hy7DOKb7ILeGEwWA8faKH5ukJ-XpfLT8";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const monthsArabic = ["يناير","فبراير","مارس","أبريل","مايو","يونيو",
+                        "يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+  function formatDateToArabic(d) {
+    if (!d) return "";
+    const date = new Date(d);
+    if (isNaN(date)) return d;
+    const day = date.getDate();
+    const month = monthsArabic[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  }
+
+  const reportSelect   = document.getElementById('reportSelect');
+  const loadingMsg     = document.getElementById('loadingMsg');
+  const reportContainer = document.getElementById('reportContainer');
+
+  // تعبئة قائمة التقارير
+  async function loadReportsList() {
+    loadingMsg.textContent = "جاري تحميل قائمة التقارير من قاعدة البيانات...";
+    const { data, error } = await supabaseClient
+      .from('daily_reports')
+      .select('*')
+      .order('report_date', { ascending: false })
+      .order('id', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      loadingMsg.textContent = "حدث خطأ أثناء تحميل قائمة التقارير.";
+      return;
+    }
+
+    loadingMsg.textContent = "";
+    reportSelect.innerHTML = '<option value="">-- اختر تقريرًا من القائمة --</option>';
+
+    if (!data || data.length === 0) {
+      loadingMsg.textContent = "لا توجد تقارير محفوظة حتى الآن.";
+      return;
+    }
+
+    data.forEach(rep => {
+      const option = document.createElement('option');
+      const dateStr = rep.report_date ? formatDateToArabic(rep.report_date) : "(بدون تاريخ)";
+      const team = rep.team_code ? `فريق (${rep.team_code})` : "فريق غير محدد";
+      const section = rep.section_name ? ` - مقطع: ${rep.section_name}` : "";
+      option.value = rep.id;
+      option.textContent = `${dateStr} - ${team}${section}`;
+      reportSelect.appendChild(option);
+    });
+  }
+
+  // تحميل تفاصيل تقرير واحد
+  async function loadReportDetails(reportId) {
+    if (!reportId) {
+      reportContainer.style.display = "none";
+      return;
+    }
+
+    loadingMsg.textContent = "جاري تحميل بيانات التقرير...";
+    reportContainer.style.display = "none";
+
+    const { data: report, error: repError } = await supabaseClient
+      .from('daily_reports')
+      .select('*')
+      .eq('id', reportId)
+      .single();
+
+    if (repError || !report) {
+      console.error(repError);
+      loadingMsg.textContent = "تعذر تحميل بيانات هذا التقرير.";
+      return;
+    }
+
+    const { data: items, error: itemsError } = await supabaseClient
+      .from('daily_report_items')
+      .select('*')
+      .eq('report_id', reportId)
+      .order('item_type', { ascending: true })
+      .order('id', { ascending: true });
+
+    if (itemsError) {
+      console.error(itemsError);
+      loadingMsg.textContent = "تم تحميل رأس التقرير، لكن حدث خطأ في تحميل البنود.";
+      return;
+    }
+
+    renderReport(report, items || []);
+    loadingMsg.textContent = "";
+    reportContainer.style.display = "block";
+  }
+
+  // مساعدة: مسح tbody ثم تعبئته
+  function fillBody(bodyId, rowsHtmlArray, colspan) {
+    const body = document.getElementById(bodyId);
+    body.innerHTML = "";
+    if (!rowsHtmlArray.length) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="${colspan}" class="no-data">لا توجد بيانات مسجلة في هذا القسم.</td>`;
+      body.appendChild(tr);
+      return;
+    }
+    rowsHtmlArray.forEach(html => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = html;
+      body.appendChild(tr);
+    });
+  }
+
+  function renderReport(report, items) {
+    // العنوان
+    const teamLabel = report.team_code ? `الفريق (${report.team_code})` : "الفريق";
+    document.getElementById('reportTitle').textContent = `التقرير اليومي لـ ${teamLabel}`;
+
+    document.getElementById('projectName').textContent = report.project_name || "";
+    document.getElementById('sectionName').textContent = report.section_name || "";
+    document.getElementById('reportDate').textContent = report.report_date ? formatDateToArabic(report.report_date) : "";
+    document.getElementById('reportDay').textContent = report.report_day || "";
+    document.getElementById('teamCode').textContent = report.team_code || "";
+    document.getElementById('preparedBy').textContent = report.prepared_by || "";
+
+    const workItems = items.filter(i => i.item_type === 'work');
+    const laborItems = items.filter(i => i.item_type === 'labor');
+    const equipItems = items.filter(i => i.item_type === 'equipment');
+    const safetyItems = items.filter(i => i.item_type === 'safety');
+    const issueItems = items.filter(i => i.item_type === 'issue');
+
+    // الأعمال
+    const workRows = workItems.map(i => `
+      <td>${i.task_name || ""}</td>
+      <td>${i.description || ""}</td>
+      <td>${i.quantity || ""}</td>
+    `);
+    fillBody('workBody', workRows, 3);
+
+    // الموظفين
+    const laborRows = laborItems.map(i => `
+      <td>${i.task_name || ""}</td>
+      <td>${i.quantity || ""}</td>
+      <td>${i.description || ""}</td>
+    `);
+    fillBody('laborBody', laborRows, 3);
+
+    // المعدات
+    const equipRows = equipItems.map(i => {
+      const extra = i.extra || {};
+      return `
+        <td>${i.task_name || ""}</td>
+        <td>${i.quantity || ""}</td>
+        <td>${extra.hours || ""}</td>
+        <td>${extra.status || ""}</td>
+      `;
+    });
+    fillBody('equipBody', equipRows, 4);
+
+    // السلامة
+    const safetyRows = safetyItems.map(i => {
+      const extra = i.extra || {};
+      const checked = extra.checked ? "✔" : "";
+      return `
+        <td>${i.task_name || ""}</td>
+        <td style="text-align:center;">${checked}</td>
+        <td>${i.description || ""}</td>
+      `;
+    });
+    fillBody('safetyBody', safetyRows, 3);
+
+    // المعوقات
+    const issueRows = issueItems.map(i => `
+      <td>${i.task_name || ""}</td>
+      <td>${i.description || ""}</td>
+      <td>${i.quantity || ""}</td>
+    `);
+    fillBody('issueBody', issueRows, 3);
+  }
+
+  // الأحداث
+  reportSelect.addEventListener('change', () => {
+    const id = reportSelect.value;
+    loadReportDetails(id);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadReportsList();
+  });
+</script>
+</body>
+</html>
