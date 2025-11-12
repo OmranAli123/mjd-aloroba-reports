@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>نموذج فحص الخير للآليات والمعدات</title>
+
+  <!-- Tailwind (كما في نسختك) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Readex+Pro:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --brand-black:#212529; --brand-yellow:#FFC107; --brand-light-gray:#F8F9FA; --brand-medium-gray:#6C757D;
+      --brand-border-gray:#DEE2E6; --brand-danger-red:#DC3545; --brand-success:#198754; --brand-info:#0ea5e9;
+      --bg-info:rgba(14,165,233,.10); --bg-danger:rgba(220,53,69,.10); --bg-success:rgba(25,135,84,.10);
+      --font-title:'Cairo',sans-serif; --font-body:'Readex Pro',sans-serif;
+    }
+    body{font-family:var(--font-body);background:var(--brand-light-gray);color:var(--brand-black)}
+    .form-container{max-width:860px;margin:1.25rem auto;padding:0 1rem}
+    .header h1{font-family:var(--font-title);font-weight:900;font-size:2rem;text-align:center;margin:1rem 0 1.25rem}
+    .header h1 .highlight{color:var(--brand-yellow)}
+    .form-section{background:#fff;border-radius:12px;padding:1.25rem 1.25rem;margin-bottom:1rem;box-shadow:0 8px 20px rgba(0,0,0,.06);border:1px solid var(--brand-border-gray)}
+    h2{font-family:var(--font-title);font-weight:700;font-size:1.25rem;text-align:right;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--brand-border-gray)}
+    .input-group{margin-bottom:1rem}
+    .input-group label{display:block;font-weight:700;margin-bottom:.5rem;color:var(--brand-medium-gray);font-family:var(--font-title)}
+    .input-group input[type="text"], .input-group input[type="date"], .input-group input[type="datetime-local"],
+    .input-group input[type="number"], .input-group textarea, .input-group select{
+      width:100%;padding:.75rem 1rem;border:1px solid var(--brand-border-gray);border-radius:8px;
+      font-family:var(--font-body);transition:border-color .2s, box-shadow .2s;background:var(--brand-light-gray)
+    }
+    .input-group input:focus,.input-group textarea:focus,.input-group select:focus{
+      outline:none;border-color:var(--brand-yellow);box-shadow:0 0 0 3px rgba(255,193,7,.2)
+    }
+    .en-num{direction:ltr;font-family:'Readex Pro','Segoe UI',Tahoma,sans-serif;}
+    .checklist-item{border-bottom:1px solid var(--brand-border-gray);padding:1rem 0;border-radius:10px;transition:background-color .2s}
+    .checklist-item:last-child{border-bottom:none}
+    .checklist-item-header{font-weight:700;color:var(--brand-black);margin-bottom:.75rem;font-size:1.05rem}
+    .pill-group{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+    .pill{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:999px;border:2px solid var(--brand-border-gray);
+      background:var(--brand-light-gray);cursor:pointer;font-weight:600;transition:all .15s}
+    .pill input[type="radio"]{display:none}
+    .ok-selected{background:var(--bg-success);border-color:var(--brand-success)}
+    .faulty-selected{background:var(--bg-danger);border-color:var(--brand-danger-red)}
+    .notes-input{width:100%;padding:.65rem .9rem;border:1px solid var(--brand-border-gray);border-radius:8px;background:#fff}
+    .notes-required{box-shadow:0 0 0 3px rgba(220,53,69,.18)!important;border-color:var(--brand-danger-red)!important}
+    .btn{background:var(--brand-black);color:#fff;padding:1rem 1.25rem;border:none;border-radius:10px;cursor:pointer;
+      font-family:var(--font-title);font-weight:800;font-size:1.05rem;width:100%;box-shadow:0 4px 15px rgba(0,0,0,.1);transition:background .2s, transform .2s}
+    .btn:hover{background:#3a4149;transform:translateY(-1px)}
+    .btn-print{background:#0f172a}
+    .btn-save{background:#0ea5e9}
+    .btn-save:hover{background:#0a86bd}
+    .action-pills .pill{border-width:1px}
+    .action-ok-selected{background:var(--bg-success);border-color:var(--brand-success);color:#0f172a}
+    .action-report-selected{background:var(--bg-info);border-color:var(--brand-info);color:#0f172a}
+    .action-stop-selected{background:var(--bg-danger);border-color:var(--brand-danger-red);color:#0f172a}
+    .bg-action-reported{background:var(--bg-info)}
+    .bg-action-stop{background:var(--bg-danger)}
+    .hint{color:#6b7280;font-size:.9rem}
+    @media print{.no-print{display:none !important}body{background:#fff} .form-section{box-shadow:none}}
+  </style>
+</head>
+<body id="pageBody">
+  <div class="form-container">
+    <form id="checklistForm">
+      <header class="header">
+        <h1><span class="highlight">الخير</span> للآليات والمعدات</h1>
+      </header>
+
+      <!-- معلومات عامة -->
+      <div class="form-section">
+        <h2>معلومات عامة</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+          <div class="input-group">
+            <label for="equipment">الآلية:</label>
+            <select id="equipment" name="equipment" required>
+              <option value="" disabled selected>اختر الآلية</option>
+              <option>شاحنة سكانيا</option><option>شاحنة دنبر</option><option>ايفكو قلّاب</option>
+              <option>حفار 1</option><option>حفار 2</option><option>حفار عقرب</option>
+              <option>لودر 48</option><option>لودر 56-1</option><option>لودر 56-2</option>
+              <option>مدحلة 4 طن</option><option>صهريج مياه 12 م³</option>
+              <option>بوب كات</option><option>بورتر دبل</option><option>بورتر</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="meter">قراءة عداد الساعات / عداد الكلومترات:</label>
+            <input type="number" id="meter" name="meter" inputmode="decimal" lang="en" pattern="[0-9.]*" placeholder="اكتب قراءة العداد المناسبة" class="en-num">
+          </div>
+          <div class="input-group">
+            <label for="dateDisplay">التاريخ والوقت:</label>
+            <input type="text" id="dateDisplay" class="bg-gray-200 cursor-not-allowed en-num" lang="en" dir="ltr" readonly placeholder="YYYY/MM/DD HH:MM">
+            <input type="hidden" id="date" name="date">
+            <div class="hint">يُعبّأ تلقائيًا الآن (يُحدّث كل دقيقة).</div>
+          </div>
+          <div class="input-group">
+            <label for="operator">اسم المشغل/الفاحص:</label>
+            <input type="text" id="operator" name="operator" list="operators" placeholder="ابحث واختر الاسم">
+          </div>
+          <datalist id="operators">
+            <option value="سالم القدار"><option value="محمد عبدالرحمن"><option value="وسيم الجداوي">
+            <option value="هدية الطرلي"><option value="عمر سامي"><option value="يحي زكريا">
+            <option value="محمد التونسي"><option value="محمد ممدوح"><option value="محمد سامي">
+            <option value="مصباح شكر"><option value="محمد سالم"><option value="صلاح عبدالوهاب"><option value="حاتم بن فرج">
+          </datalist>
+        </div>
+      </div>
+
+      <!-- 1. الفحص قبل التشغيل -->
+      <div class="form-section">
+        <h2>1. الفحص قبل بدء التشغيل</h2>
+
+        <div class="checklist-item" data-group="leak_check">
+          <div class="checklist-item-header">التأكد من عدم وجود تسريبات (زيت، وقود، سائل تبريد)</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="leak_check" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="leak_check" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="leak_check_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+
+        <div class="checklist-item" data-group="tires_tracks">
+          <div class="checklist-item-header">فحص الإطارات/الجنازير (ضغط، تآكل، تلف، شد)</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="tires_tracks" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="tires_tracks" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="tires_tracks_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+
+        <div class="checklist-item" data-group="attachments">
+          <div class="checklist-item-header">فحص حالة الملحقات (بكت، شفرة، شوكة)</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="attachments" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="attachments" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="attachments_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+
+        <div class="checklist-item" data-group="visibility">
+          <div class="checklist-item-header">نظافة الزجاج والمرايا والإضاءة</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="visibility" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="visibility" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="visibility_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+
+        <div class="checklist-item" data-group="fire_extinguisher">
+          <div class="checklist-item-header">وجود وتجهيز طفاية الحريق</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="fire_extinguisher" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="fire_extinguisher" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="fire_extinguisher_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+
+        <div class="checklist-item" data-group="steps_handles">
+          <div class="checklist-item-header">سلامة ونظافة درجات السلم ومقابض اليد</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="steps_handles" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="steps_handles" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="steps_handles_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+      </div>
+
+      <!-- 2. الفحص داخل الكابينة -->
+      <div class="form-section">
+        <h2>2. الفحص داخل الكابينة</h2>
+
+        <div class="checklist-item" data-group="cabin_cleanliness">
+          <div class="checklist-item-header">نظافة وترتيب الكابينة</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="cabin_cleanliness" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="cabin_cleanliness" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="cabin_cleanliness_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+
+        <div class="checklist-item" data-group="wipers">
+          <div class="checklist-item-header">المسّاحات (عمل الشفرات/خزان الماء)</div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="wipers" value="ok"> سليم</label>
+            <label class="pill"><input type="radio" name="wipers" value="faulty"> غير سليم</label>
+          </div>
+          <input type="text" name="wipers_notes" placeholder="ملاحظات..." class="notes-input">
+        </div>
+      </div>
+
+      <!-- 3. الإجراء المتخذ -->
+      <div class="form-section">
+        <h2>الإجراء المتخذ</h2>
+        <div class="pill-group action-pills" id="actionGroup" role="radiogroup">
+          <label class="pill" data-action="ok"><input type="radio" name="action" value="ok"> صالحة للعمل</label>
+          <label class="pill" data-action="reported"><input type="radio" name="action" value="reported"> تم الإبلاغ للصيانة</label>
+          <label class="pill" data-action="stop"><input type="radio" name="action" value="stop"> إيقاف حتى الإصلاح</label>
+        </div>
+        <p class="text-sm text-slate-600 mt-2">* في حال اختيار "تم الإبلاغ" أو "إيقاف"، تُصبح الملاحظات أدناه إلزامية ويتم تلوين الخلفية وفق الحالة.</p>
+      </div>
+
+      <!-- ملاحظات عامة -->
+      <div class="form-section">
+        <h2>ملاحظات إضافية / الأعطال المبلغ عنها</h2>
+        <div class="input-group">
+          <textarea id="additional_notes" name="additional_notes" rows="5" placeholder="اكتب أي ملاحظات إضافية هنا..."></textarea>
+        </div>
+      </div>
+
+      <!-- الأزرار -->
+      <div class="form-section no-print">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <button type="button" id="btnSave" class="btn btn-save">💾 حفظ في قاعدة البيانات</button>
+          <button type="button" id="btnPrint" class="btn btn-print">🖨 طباعة PDF</button>
+        </div>
+        <p id="saveHint" class="hint mt-3"></p>
+      </div>
+
+      <p id="errorBox" class="text-red-600 font-bold mt-3 hidden">فضلاً أكمل الملاحظات المطلوبة.</p>
+    </form>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <script>
+    // ============= إعداد Supabase (غيّر القيم) =============
+    const SUPABASE_URL = "https://scnatcektqebuwyzflgb.supabase.co";      // مثال: https://xxxx.supabase.co
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjbmF0Y2VrdHFlYnV3eXpmbGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODIzMDksImV4cCI6MjA3ODM1ODMwOX0.meASFDbwYz9Hy7DOKb7ILeGEwWA8faKH5ukJ-XpfLT8"; // المفتاح العام anon
+    const sb = (SUPABASE_URL && SUPABASE_ANON_KEY) ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    // تحويل أرقام عربية/فارسية إلى إنجليزية
+    function toEnglishDigits(str){
+      if(!str) return str;
+      const mapAr = '٠١٢٣٤٥٦٧٨٩';
+      const mapFa = '۰۱۲۳۴۵۶۷۸۹';
+      return str.replace(/[٠-٩]/g, d => mapAr.indexOf(d))
+                .replace(/[۰-۹]/g, d => mapFa.indexOf(d));
+    }
+
+    const form = document.getElementById('checklistForm');
+    const errorBox = document.getElementById('errorBox');
+    const pageBody = document.getElementById('pageBody');
+    const additionalNotes = document.getElementById('additional_notes');
+    const saveHint = document.getElementById('saveHint');
+
+    // سلوك البنود (تلوين وفرض ملاحظة عند "غير سليم")
+    function setupChecklistBehaviour(){
+      const items = document.querySelectorAll('.checklist-item');
+      items.forEach(item => {
+        const group = item.getAttribute('data-group');
+        if(!group) return;
+        const notes = item.querySelector(`input[name="${group}_notes"], textarea[name="${group}_notes"]`);
+        const pills = item.querySelectorAll('.pill');
+
+        function applyState(){
+          const selected = item.querySelector(`input[type="radio"][name="${group}"]:checked`);
+          item.classList.remove('ok-selected','faulty-selected');
+          pills.forEach(p=> p.classList.remove('ok-selected','faulty-selected'));
+          if(notes){ notes.classList.remove('notes-required'); notes.removeAttribute('required'); }
+          if(selected){
+            if(selected.value === 'ok'){
+              item.classList.add('ok-selected');
+              pills.forEach(p=>{ if(p.querySelector('input').value==='ok') p.classList.add('ok-selected'); });
+            }else{
+              item.classList.add('faulty-selected');
+              pills.forEach(p=>{ if(p.querySelector('input').value==='faulty') p.classList.add('faulty-selected'); });
+              if(notes){
+                notes.setAttribute('required','required');
+                notes.classList.add('notes-required');
+                notes.placeholder='مطلوب: اكتب الملاحظة لعدم السلامة';
+              }
+            }
+          }
+        }
+
+        item.querySelectorAll('input[type="radio"]').forEach(r=> r.addEventListener('change', applyState));
+        applyState();
+      });
+    }
+
+    // تلوين الخلفية العامة وفرض ملاحظات عامة عند اختيار الإجراء "تم الإبلاغ" أو "إيقاف"
+    function setupActionPills(){
+      const container = document.getElementById('actionGroup');
+      if(!container) return;
+      const map = { ok:'action-ok-selected', reported:'action-report-selected', stop:'action-stop-selected' };
+      function apply(){
+        const selected = container.querySelector('input[type="radio"]:checked');
+        container.querySelectorAll('.pill').forEach(p=> p.classList.remove('action-ok-selected','action-report-selected','action-stop-selected'));
+        pageBody.classList.remove('bg-action-reported','bg-action-stop');
+        additionalNotes.removeAttribute('required');
+        additionalNotes.classList.remove('notes-required');
+
+        if(selected){
+          const act = selected.parentElement.getAttribute('data-action');
+          selected.parentElement.classList.add(map[act]);
+          if(act === 'reported'){
+            pageBody.classList.add('bg-action-reported');
+            additionalNotes.setAttribute('required','required');
+            additionalNotes.classList.add('notes-required');
+            additionalNotes.placeholder = 'مطلوب: اكتب تفاصيل البلاغ/الخلل.';
+          }else if(act === 'stop'){
+            pageBody.classList.add('bg-action-stop');
+            additionalNotes.setAttribute('required','required');
+            additionalNotes.classList.add('notes-required');
+            additionalNotes.placeholder = 'مطلوب: اكتب سبب الإيقاف وخطوات المعالجة.';
+          }
+        }
+      }
+      container.querySelectorAll('input[type="radio"]').forEach(r=> r.addEventListener('change', apply));
+      apply();
+    }
+
+    document.getElementById('btnPrint')?.addEventListener('click', ()=> window.print());
+
+    // منع إرسال form الافتراضي
+    form?.addEventListener('submit', function(e){ e.preventDefault(); });
+
+    // عرض التاريخ والوقت الآن (يتحدّث كل دقيقة)
+    (function(){
+      const pad = n => String(n).padStart(2,'0');
+      function updateNow(){
+        const hiddenDate = document.getElementById('date');       // ISO
+        const dateDisplay = document.getElementById('dateDisplay'); // مرئي فقط
+        if(!hiddenDate || !dateDisplay) return;
+        const now = new Date(); now.setSeconds(0,0);
+        const iso = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        const display = `${now.getFullYear()}/${pad(now.getMonth()+1)}/${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        hiddenDate.value = iso;
+        dateDisplay.value = toEnglishDigits(display);
+      }
+      if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', updateNow); } else { updateNow(); }
+      setInterval(updateNow, 60000);
+      document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateNow(); });
+    })();
+
+    // ===== جمع البيانات من الصفحة إلى كائن واحد
+    function collectFormData(){
+      const equipment = document.getElementById('equipment')?.value || '';
+      const meterRaw  = document.getElementById('meter')?.value || '';
+      const meter     = toEnglishDigits(meterRaw);
+      const readingAt = document.getElementById('date')?.value || '';   // ISO (yyyy-mm-ddThh:mm)
+      const operator  = document.getElementById('operator')?.value || '';
+      const actionEl  = document.querySelector('#actionGroup input[type="radio"]:checked');
+      const action    = actionEl ? actionEl.value : null;
+      const addNotes  = document.getElementById('additional_notes')?.value || '';
+
+      // عناصر الفحص
+      const itemsObj = {};
+      document.querySelectorAll('.checklist-item').forEach(item=>{
+        const group = item.getAttribute('data-group');
+        if(!group) return;
+        const statusEl = item.querySelector(`input[type="radio"][name="${group}"]:checked`);
+        const notesEl  = item.querySelector(`input[name="${group}_notes"], textarea[name="${group}_notes"]`);
+        itemsObj[group] = {
+          status: statusEl ? statusEl.value : null,
+          notes : notesEl ? notesEl.value : ''
+        };
+      });
+
+      return {
+        equipment,
+        meter: meter ? Number(meter) : null,
+        reading_at: readingAt ? new Date(readingAt).toISOString() : new Date().toISOString(),
+        operator,
+        action,
+        additional_notes: addNotes,
+        items: itemsObj
+      };
+    }
+
+    // ===== تحقق بسيط قبل الحفظ
+    function simpleValidate(payload){
+      if(!payload.equipment){ return 'رجاءً اختر الآلية.'; }
+      if(!payload.action){ return 'رجاءً اختر "الإجراء المتخذ".'; }
+      // إن كانت الحالة reported/stop يلزم ملاحظات عامة
+      if((payload.action==='reported' || payload.action==='stop') && !payload.additional_notes.trim()){
+        return 'عند اختيار "تم الإبلاغ" أو "إيقاف" يجب كتابة الملاحظات العامة.';
+      }
+      // لأي بند مختار "غير سليم" يجب أن تكون له ملاحظة
+      for(const [key,val] of Object.entries(payload.items)){
+        if(val && val.status==='faulty' && !(val.notes||'').trim()){
+          return 'هناك بنود غير سليمة بدون ملاحظات. رجاءً اكملها.';
+        }
+      }
+      return null;
+    }
+
+    // ===== زر الحفظ إلى Supabase
+    document.getElementById('btnSave')?.addEventListener('click', async ()=>{
+      if(!sb){
+        saveHint.textContent = '⚠️ رجاء ضبط SUPABASE_URL و SUPABASE_ANON_KEY أولًا.';
+        saveHint.style.color = '#dc2626';
+        return;
+      }
+      saveHint.textContent = ''; saveHint.style.color = '#6b7280';
+
+      const payload = collectFormData();
+      const err = simpleValidate(payload);
+      if(err){
+        saveHint.textContent = err;
+        saveHint.style.color = '#dc2626';
+        return;
+      }
+
+      try{
+        // الإدخال
+        const { data, error } = await sb
+          .from('equipment_checks')
+          .insert({
+            equipment: payload.equipment,
+            meter: payload.meter,
+            reading_at: payload.reading_at,
+            operator: payload.operator,
+            action: payload.action,
+            additional_notes: payload.additional_notes,
+            items: payload.items
+          })
+          .select('id, created_at')
+          .single();
+
+        if(error) throw error;
+
+        saveHint.innerHTML = `✔️ تم الحفظ بنجاح. <span class="en-num">ID: ${data.id}</span>`;
+        saveHint.style.color = '#15803d';
+      }catch(e){
+        console.error(e);
+        saveHint.textContent = 'حدث خطأ أثناء الحفظ. تأكد من السياسات والجدول.';
+        saveHint.style.color = '#dc2626';
+      }
+    });
+
+    // تهيئة
+    setupChecklistBehaviour();
+    setupActionPills();
+  </script>
+</body>
+</html>
